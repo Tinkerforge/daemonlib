@@ -34,6 +34,8 @@
 
 // sets errno on error
 // FIXME: maybe use IPv6 if available
+// FIXME: compare to https://github.com/curl/curl/blob/master/lib/socketpair.c
+// FIXME: compare to https://curl.haxx.se/mail/lib-2019-10/0010.html
 int pipe_create(Pipe *pipe, uint32_t flags) {
 	IOHandle listener = IO_HANDLE_INVALID;
 	struct sockaddr_in address;
