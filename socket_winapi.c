@@ -1,6 +1,6 @@
 /*
  * daemonlib
- * Copyright (C) 2012-2017, 2020 Matthias Bolte <matthias@tinkerforge.com>
+ * Copyright (C) 2012-2017, 2020-2021 Matthias Bolte <matthias@tinkerforge.com>
  * Copyright (C) 2014 Olaf Lüke <olaf@tinkerforge.com>
  *
  * socket_winapi.c: WinAPI based socket implementation

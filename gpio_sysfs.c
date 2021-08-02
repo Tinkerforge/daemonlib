@@ -2,6 +2,7 @@
  * daemonlib
  * Copyright (C) 2018 Olaf Lüke <olaf@tinkerforge.com>
  * Copyright (C) 2018, 2021 Matthias Bolte <matthias@tinkerforge.com>
+ * Copyright (C) 2020 Erik Fleckstein <erik@tinkerforge.com>
  *
  * gpio_sysfs.c: GPIO functions for using Linux sysfs
  *
