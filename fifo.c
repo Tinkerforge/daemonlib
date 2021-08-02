@@ -128,9 +128,9 @@ int fifo_write(FIFO *fifo, const void *buffer, int length, uint32_t flags) {
 				condition_wait(&fifo->writable_condition, &fifo->mutex);
 
 				// no point in trying to write any remaining data now. depending
-				// on the thread scheduling a fifo_read call in oather thread
-				// might have already  returned 0 (end-of-file) between the time
-				// the writable condition being signalled and this thread being
+				// on the thread scheduling a fifo_read call in another thread
+				// might have already returned 0 (end-of-file) between the time
+				// the writable condition being signaled and this thread being
 				// able to act on it. therefore, just give up here.
 				if (fifo->shutdown) {
 					mutex_unlock(&fifo->mutex);
