@@ -29,8 +29,8 @@
 
 static LogSource _log_source = LOG_SOURCE_INITIALIZER;
 
-#define MAX_QUEUED_WRITES 32768
-#define DROPPED_PACKETS_WARNING_INTERVAL 5000 // milliseconds
+#define MAX_QUEUED_PACKETS 32768
+#define QUEUED_PACKETS_DROP_COUNT 512
 
 static void writer_handle_write(void *opaque) {
 	Writer *writer = opaque;
@@ -100,27 +100,19 @@ static int writer_push_packet_to_backlog(Writer *writer, Packet *packet, int wri
 	                 writer->recipient_signature(recipient_signature, true, writer->opaque),
 	                 writer->packet_type, writer->backlog.count);
 
-	if (writer->backlog.count >= MAX_QUEUED_WRITES) {
-		packets_to_drop = writer->backlog.count - MAX_QUEUED_WRITES + 1;
+	if (writer->backlog.count >= MAX_QUEUED_PACKETS) {
+		packets_to_drop = writer->backlog.count - MAX_QUEUED_PACKETS + QUEUED_PACKETS_DROP_COUNT;
 
-		if (writer->last_dropped_packets_warning + DROPPED_PACKETS_WARNING_INTERVAL < millitime()) {
-			writer->last_dropped_packets_warning = millitime();
+		log_warn("Write backlog for %s is full, dropping %u queued %s(s), %u + %u dropped in total",
+		         writer->recipient_signature(recipient_signature, false, writer->opaque),
+		         packets_to_drop, writer->packet_type,
+		         writer->dropped_packets, packets_to_drop);
 
-			log_warn("Write backlog for %s is full, dropping %u queued %s(s), %u + %u dropped in total",
-			         writer->recipient_signature(recipient_signature, false, writer->opaque),
-			         packets_to_drop, writer->packet_type,
-			         writer->dropped_packets, packets_to_drop);
-		} else {
-			log_debug("Write backlog for %s is full, dropping %u queued %s(s), %u + %u dropped in total",
-			          writer->recipient_signature(recipient_signature, false, writer->opaque),
-			          packets_to_drop, writer->packet_type,
-			          writer->dropped_packets, packets_to_drop);
-		}
-
-		writer->dropped_packets += packets_to_drop;
-
-		while (writer->backlog.count >= MAX_QUEUED_WRITES) {
+		while (packets_to_drop > 0) {
 			queue_pop(&writer->backlog, NULL);
+
+			--packets_to_drop;
+			++writer->dropped_packets;
 		}
 	}
 
@@ -167,7 +159,6 @@ int writer_create(Writer *writer, IO *io,
 	writer->recipient_disconnect = recipient_disconnect;
 	writer->opaque = opaque;
 	writer->dropped_packets = 0;
-	writer->last_dropped_packets_warning = 0;
 
 	// create write queue
 	if (queue_create(&writer->backlog, sizeof(PartialPacket)) < 0) {

@@ -48,7 +48,6 @@ typedef struct {
 	WriterRecipientDisconnectFunction recipient_disconnect;
 	void *opaque;
 	uint32_t dropped_packets;
-	uint64_t last_dropped_packets_warning;
 	Queue backlog;
 } Writer;
 
