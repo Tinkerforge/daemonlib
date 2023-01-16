@@ -41,9 +41,9 @@ int daemon_start(const char *log_filename, File *log_file,
 	pid_t pid;
 	int pid_fd = -1;
 	uint8_t success = 0;
-	bool log_file_created = false;
 	IO *previous_log_output = NULL;
 	LogRotateFunction previous_log_rotate = NULL;
+	bool log_initialitzed = false;
 	int stdin_fd = -1;
 	int stdout_fd = -1;
 
@@ -150,10 +150,11 @@ int daemon_start(const char *log_filename, File *log_file,
 		goto cleanup;
 	}
 
-	log_file_created = true;
-
+	log_init();
 	log_get_output(&previous_log_output, &previous_log_rotate);
 	log_set_output(&log_file->base, NULL);
+
+	log_initialitzed = true;
 
 	// redirect standard file descriptors
 	stdin_fd = open("/dev/null", O_RDONLY);
@@ -203,9 +204,10 @@ cleanup:
 	}
 
 	if (success == 0) {
-		if (log_file_created) {
+		if (log_initialitzed) {
 			log_set_output(previous_log_output, previous_log_rotate);
 			file_destroy(log_file);
+			log_exit();
 		}
 
 		robust_close(pid_fd);
