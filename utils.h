@@ -59,7 +59,7 @@ uint64_t microtime(void);
 uint64_t millitime(void);
 
 #if !defined _GNU_SOURCE && !defined __APPLE__ && !defined __ANDROID__
-char *strcasestr(char *haystack, char *needle);
+char *strcasestr(const char *haystack, const char *needle);
 #endif
 
 int red_brick_uid(uint32_t *uid /* always little endian */);
