@@ -582,13 +582,13 @@ uint64_t millitime(void) { // monotonic
 #include <ctype.h>
 
 char *strcasestr(const char *haystack, const char *needle) {
-	char *p, *startn = NULL, *np = NULL;
+	const char *p, *startn = NULL, *np = NULL;
 
 	for (p = haystack; *p != '\0'; ++p) {
 		if (np != NULL) {
 			if (toupper(*p) == toupper(*np)) {
 				if (*++np == '\0') {
-					return startn;
+					return (char *)startn;
 				}
 			} else {
 				np = NULL;
